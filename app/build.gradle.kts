@@ -39,11 +39,12 @@ android {
 rustJni{
     rustPath = "./app/src/main/rust"
     ndkVersion = "29.0.13113456"
+    jniHost = "com.example.rust3.MainActivity"
     architectures {
-        armv7_linux_androideabi("armv7a-linux-androideabi21-clang")
+        //armv7_linux_androideabi("armv7a-linux-androideabi21-clang")
         aarch64_linux_android("aarch64-linux-android21-clang")
-        i686_linux_android("i686-linux-android21-clang")
-        x86_64_linux_android("x86_64-linux-android21-clang")
+        //i686_linux_android("i686-linux-android21-clang")
+        //x86_64_linux_android("x86_64-linux-android21-clang")
     }
 }
 
@@ -52,6 +53,7 @@ dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
+    implementation(libs.play.services.location)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
