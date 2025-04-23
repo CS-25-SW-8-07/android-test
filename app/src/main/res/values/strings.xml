@@ -1,3 +1,6 @@
 <resources>
     <string name="app_name">rust3</string>
+    <string name="train">Train!</string>
+    <string name="loc">loc</string>
+    <string name="get_loc">Get loc</string>
 </resources>
