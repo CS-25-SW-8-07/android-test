@@ -1,22 +1,16 @@
 package com.example.rust3
 
-import android.location.Address
-import android.location.Geocoder
-import android.location.LocationListener
 import android.os.Bundle
-import android.os.Looper // <-- added
-import android.util.Log
-import android.view.View
+import android.os.Looper
 import android.widget.Button
 import android.widget.TextView
-import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import java.io.File
-import java.io.IOException
-import java.util.Locale
 import android.Manifest
+import android.annotation.SuppressLint
 import android.content.pm.PackageManager
+import androidx.collection.ArraySet
 import androidx.core.app.ActivityCompat
 import com.google.android.gms.location.*
 
@@ -25,7 +19,7 @@ class MainActivity : AppCompatActivity() {
     //<RustJNI>
     // auto-generated code
 
-    external fun startProgram(artifact_path: String): String
+    external fun startTraining(artifactPath: String, locationString: String): String
 
     init { System.loadLibrary("my_rust_lib") }
 
@@ -33,13 +27,15 @@ class MainActivity : AppCompatActivity() {
 
 
 
-
     private lateinit var locationClient: FusedLocationProviderClient
     private lateinit var locationText: TextView
-    private val locationList = ArrayList<String>() // store location strings
-    private var locationUpdatesRunning = false // prevent duplicate starts
+    private val locationList = ArrayList<String>()
+    private var locationUpdatesRunning = false
     private lateinit var locationCallback: LocationCallback
+    private lateinit var artifactPath: String
+    private lateinit var locationString: String
 
+    private val entryAmount = 3
     private val LOCATION_PERMISSION_REQUEST = 1001
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -53,20 +49,16 @@ class MainActivity : AppCompatActivity() {
             artifactDir.mkdirs()
         }
 
-        val myBtn: Button = findViewById(R.id.somebtn)
-        val artifact_path = artifactDir.absolutePath
+        artifactPath = artifactDir.absolutePath
 
-        myBtn.setOnClickListener {
-            val text = findViewById<TextView>(R.id.kagemand)
-            text.text = startProgram(artifact_path)
-        }
+        locationString = ""
 
         locationText = findViewById(R.id.loc)
-        val getLocationBtn = findViewById<Button>(R.id.getLoc)
+        val startBtn = findViewById<Button>(R.id.startProgram)
 
         locationClient = LocationServices.getFusedLocationProviderClient(this)
 
-        getLocationBtn.setOnClickListener {
+        startBtn.setOnClickListener {
             startLocationUpdates() // now triggers continuous updates
         }
     }
@@ -95,17 +87,23 @@ class MainActivity : AppCompatActivity() {
         locationCallback = object : LocationCallback() {
             override fun onLocationResult(locationResult: LocationResult) {
                 val location = locationResult.lastLocation
-                if (location != null && locationList.size < 10) {
+
+                if (locationList.size == 0){
+                    val timestamp = System.currentTimeMillis()
+
+                    locationString += "$timestamp,"
+
+                }
+                if (location != null && locationList.size < entryAmount) {
                     val lat = location.latitude
                     val lon = location.longitude
-                    val entry = "Lat: $lat, Lon: $lon"
+                    val entry = "($lat, $lon),"
                     locationList.add(entry)
+                    locationString += entry
 
-                    // Update TextView with all entries
-                    locationText.text = locationList.joinToString("\n")
+                    locationText.text = locationString
 
-                    // Stop if we've collected 10 entries
-                    if (locationList.size >= 10) {
+                    if (locationList.size >= entryAmount) {
                         stopLocationUpdates()
                     }
                 }
@@ -125,7 +123,11 @@ class MainActivity : AppCompatActivity() {
         if (::locationCallback.isInitialized) {
             locationClient.removeLocationUpdates(locationCallback)
             locationUpdatesRunning = false
+
         }
+
+        val text = findViewById<TextView>(R.id.testView)
+        text.text = startTraining(artifactPath, locationString)
     }
 
     override fun onPause() {
@@ -133,6 +135,7 @@ class MainActivity : AppCompatActivity() {
         stopLocationUpdates()
     }
 
+    @SuppressLint("SetTextI18n")
     override fun onRequestPermissionsResult(
         requestCode: Int,
         permissions: Array<String>,
