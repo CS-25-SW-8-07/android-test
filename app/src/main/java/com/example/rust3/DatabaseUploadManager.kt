@@ -22,7 +22,6 @@ class DatabaseUploadManager(private val artifactPath: String) {
                 connection.setRequestProperty("Content-Type", "application/octet-stream")
                 connection.doOutput = true
 
-                // Read file and send the bytes directly
                 modelFile.inputStream().use { input ->
                     connection.outputStream.use { output ->
                         input.copyTo(output)
@@ -30,15 +29,14 @@ class DatabaseUploadManager(private val artifactPath: String) {
                 }
 
                 if (connection.responseCode == HttpURLConnection.HTTP_OK) {
-                    println("File uploaded successfully.")
+                    println("The model was uploaded successfully.")
                 } else {
-                    println("Failed to upload file. Response code: ${connection.responseCode}")
+                    println("The model Failed to upload. ${connection.responseCode}")
                 }
-
                 connection.disconnect()
 
             } catch (e: IOException) {
-                println("Error uploading file: ${e.message}")
+                println("Error uploading the model: ${e.message}")
             }
         } else {
             println("Model file does not exist.")
