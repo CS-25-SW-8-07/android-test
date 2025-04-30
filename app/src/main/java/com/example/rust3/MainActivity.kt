@@ -27,6 +27,7 @@ class MainActivity : AppCompatActivity() {
 
 
 
+
     private lateinit var locationClient: FusedLocationProviderClient
     private lateinit var locationText: TextView
     private val locationList = ArrayList<String>()
@@ -61,6 +62,13 @@ class MainActivity : AppCompatActivity() {
         startBtn.setOnClickListener {
             startLocationUpdates() // now triggers continuous updates
         }
+        val uploadButton = findViewById<Button>(R.id.uploadButton)
+        val uploader = DatabaseUploadManager(filesDir.absolutePath)
+
+        uploadButton.setOnClickListener {
+            uploader.uploadModelFile(uploader.serverUrl)
+        }
+
     }
 
     private fun startLocationUpdates() {

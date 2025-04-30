@@ -7,17 +7,19 @@ import java.net.URL
 
 class DatabaseUploadManager(private val artifactPath: String) {
 
+    val serverUrl = "http://10.0.2.2:8080/uploadModel" // Ip for emulator
+    //val serverUrl = "http://172.25.18.191:8080/uploadModel" // Ip for real phone
     private val modelFile = File(artifactPath, "model.bin")
 
     fun checkModelFileExistence(): Boolean {
         return modelFile.exists()
     }
 
-    fun uploadModelFile(uploadUrl: String) {
+    fun uploadModelFile(serverUrl: String) {
 
         if (modelFile.exists()) {
             try {
-                val connection = URL(uploadUrl).openConnection() as HttpURLConnection
+                val connection = URL(serverUrl).openConnection() as HttpURLConnection
                 connection.requestMethod = "POST"
                 connection.setRequestProperty("Content-Type", "application/octet-stream")
                 connection.doOutput = true
@@ -41,6 +43,11 @@ class DatabaseUploadManager(private val artifactPath: String) {
         } else {
             println("Model file does not exist.")
         }
+    }
+    fun downloadModelFile(serverUrl: String){
+        val connection = URL(serverUrl).openConnection() as HttpURLConnection
+        connection.requestMethod = "GET"
+        connection.setRequestProperty("Content-Type", "application/octet-stream")
     }
 }
 
